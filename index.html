@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>فایت کلاب | Fight Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: linear-gradient(145deg, #1a0a1e 0%, #0c0c10 50%, #1e0a0a 100%);
+      font-family: 'Vazirmatn', sans-serif;
+      color: #d0d0d0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 15px 30px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .particle-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 30%, rgba(147, 51, 234, 0.1) 0%, transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(220, 38, 38, 0.08) 0%, transparent 50%);
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background: rgba(30, 15, 35, 0.75);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(147, 51, 234, 0.2);
+      border-radius: 32px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8);
+      padding: 20px 18px 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0 15px;
+    }
+
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(to left, #c084fc, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hamburger-btn {
+      background: rgba(107, 114, 128, 0.1);
+      border: 1px solid rgba(192, 132, 252, 0.5);
+      color: #c084fc;
+      font-size: 1.9rem;
+      width: 48px; height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 110;
+    }
+
+    .hamburger-btn:hover {
+      background: rgba(147, 51, 234, 0.2);
+      color: white;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0; right: -100%;
+      width: 280px; height: 100vh;
+      background: rgba(15, 5, 18, 0.97);
+      backdrop-filter: blur(30px);
+      border-left: 1px solid rgba(239, 68, 68, 0.4);
+      z-index: 100;
+      padding: 90px 25px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: right 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      overflow-y: auto;
+    }
+
+    .side-menu.active { right: 0; }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 95;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.3s;
+    }
+
+    .menu-overlay.show { opacity: 1; visibility: visible; }
+
+    .menu-item {
+      color: #b0a0b8;
+      font-size: 1.15rem;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(107, 114, 128, 0.05);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid transparent;
+    }
+
+    .menu-item i { color: #c084fc; width: 24px; }
+    
+    .menu-item:hover {
+      background: rgba(147, 51, 234, 0.15);
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    .main-content { margin-top: 15px; }
+
+    .page { display: none; animation: fade 0.3s ease; }
+    .page.active-page { display: block; }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: rgba(40, 20, 45, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(192, 132, 252, 0.2);
+      border-radius: 24px;
+      padding: 25px 20px;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #c084fc;
+      margin-bottom: 18px;
+      border-right: 4px solid #ef4444;
+      padding-right: 12px;
+    }
+
+    .link-box {
+      background: #1e1225;
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      border: 1px dashed #c084fc;
+    }
+
+    .ble-id {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #c084fc, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 10px 0;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #9333ea, #dc2626);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 10px 5px;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      box-shadow: 0 8px 18px rgba(239, 68, 68, 0.5);
+    }
+
+    .admin-badge {
+      background: #2d1f33;
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      color: #d8b4fe;
+      display: inline-block;
+      margin: 5px;
+    }
+
+    .owner-highlight { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+
+    .footer-note {
+      margin-top: 25px;
+      color: #9ca3af;
+      text-align: center;
+      border-top: 1px solid #374151;
+      padding-top: 18px;
+    }
+
+    .dev-text { color: #c084fc; }
+
+    .post-form-card {
+      background: rgba(50, 25, 55, 0.7);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(192, 132, 252, 0.25);
+    }
+
+    .post-input-group { display: flex; flex-direction: column; gap: 12px; }
+
+    .post-input, .name-input {
+      background: rgba(20, 10, 25, 0.8);
+      border: 1px solid rgba(192, 132, 252, 0.3);
+      border-radius: 16px;
+      padding: 14px 18px;
+      color: #e0d0f0;
+      font-family: 'Vazirmatn', sans-serif;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .post-input:focus, .name-input:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .post-input { min-height: 100px; resize: vertical; }
+
+    .post-btn {
+      background: linear-gradient(135deg, #9333ea, #dc2626);
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-end;
+    }
+
+    .post-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .posts-feed { display: flex; flex-direction: column; gap: 16px; }
+
+    .post-card {
+      background: rgba(35, 18, 40, 0.7);
+      border: 1px solid rgba(192, 132, 252, 0.2);
+      border-radius: 20px;
+      padding: 18px 20px;
+    }
+
+    .post-card:hover {
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+
+    .user-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c084fc, #ef4444);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    .user-name { color: #f0e0ff; font-weight: 700; }
+    .post-time { color: #9ca3af; font-size: 0.75rem; }
+    .post-content { color: #d8c8e8; line-height: 1.7; margin-bottom: 14px; }
+
+    .post-actions {
+      display: flex;
+      gap: 20px;
+      border-top: 1px solid rgba(107, 114, 128, 0.2);
+      padding-top: 12px;
+    }
+
+    .action-btn {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 8px;
+      border-radius: 12px;
+      transition: 0.2s;
+    }
+
+    .action-btn:hover { color: #c084fc; }
+    .like-btn.liked { color: #ef4444; }
+    .delete-btn { margin-right: auto; }
+    .delete-btn:hover { color: #ef4444; }
+
+    .no-posts { text-align: center; color: #9ca3af; padding: 30px; }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #c084fc;
+    }
+
+    .loading i { animation: spin 1s linear infinite; }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .status-bar {
+      background: #2d1f33;
+      border-radius: 12px;
+      padding: 8px 15px;
+      margin-bottom: 15px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    .status-bar.success { color: #22c55e; }
+    .status-bar.error { color: #ef4444; }
+
+    .music-player {
+      position: fixed;
+      bottom: 20px; left: 20px;
+      background: rgba(30, 15, 35, 0.9);
+      padding: 10px 18px;
+      border-radius: 40px;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      z-index: 120;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-btn {
+      background: transparent;
+      border: none;
+      color: #c084fc;
+      font-size: 1.6rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      .music-player { bottom: 15px; left: 15px; padding: 8px 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="particle-bg"></div>
+
+<div class="container">
+  <div class="header">
+    <span class="logo-text">🥊 فایت کلاب</span>
+    <div class="hamburger-btn" id="menuToggleBtn">
+      <i class="fas fa-bars"></i>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div id="homePage" class="page active-page">
+      <div class="card">
+        <div class="title">🏠 خانه</div>
+        <p style="font-size: 1.1rem; line-height: 2;">
+          فایت کلاب اصلی <span style="color:#c084fc;">بله</span> توسط 
+          <span style="color:#d8b4fe;">رضا مظفری</span> ساخته شد و 
+          <span style="color:#fca5a5;">4 مالک</span> داشته. مالک فعلی: 
+          <span style="color:#ef4444; font-weight:900;">آرشان اسپریت</span>
+        </p>
+      </div>
+    </div>
+
+    <div id="linksPage" class="page">
+      <div class="card">
+        <div class="title">🔗 لینک ورود</div>
+        <div class="link-box">
+          <div class="ble-id" id="bleID">@link_fight_club_ble</div>
+          <p>با این آیدی در <strong>بله</strong> وارد شوید</p>
+          <button class="btn" id="copyBtn"><i class="far fa-copy"></i> کپی</button>
+          <a href="https://ble.ir" target="_blank" class="btn" style="text-decoration:none;"><i class="fas fa-external-link-alt"></i> بله</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="adminsPage" class="page">
+      <div class="card">
+        <div class="title">👑 مالک و ادمین‌ها</div>
+        <span class="admin-badge owner-highlight"><i class="fas fa-crown"></i> مالک: آرشان اسپریت</span>
+        <div style="margin-top:15px;">
+          <span class="admin-badge">استاد امیر</span>
+          <span class="admin-badge">ممد کایل</span>
+          <span class="admin-badge">نئورگان</span>
+          <span class="admin-badge">لوسیفر</span>
+          <span class="admin-badge">ممد استریت</span>
+          <span class="admin-badge">امیر استریت</span>
+          <span class="admin-badge">علی نگان</span>
+          <span class="admin-badge">علی لوتی</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="aboutPage" class="page">
+      <div class="card">
+        <div class="title">📜 درباره ما</div>
+        <p>ساخته شده توسط <span class="dev-text">Team Null</span></p>
+        <p style="color:#9ca3af; margin-top:20px;">تمامی حقوق محفوظ © 2025</p>
+      </div>
+    </div>
+
+    <div id="honorPage" class="page">
+      <div class="card">
+        <div class="title">🏆 تالار افتخارات</div>
+        <div class="no-posts">🚧 در حال توسعه...</div>
+      </div>
+    </div>
+
+    <div id="newsPage" class="page">
+      <div class="card">
+        <div class="title">📢 اخبار</div>
+        <div style="background:#251a2b; border-radius:16px; padding:18px;">
+          <p>🔴 بروزرسانی‌های جدید به زودی</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="postsPage" class="page">
+      <div class="card">
+        <div class="title">📝 پست‌های کاربران</div>
+        
+        <div class="status-bar" id="statusBar">🔄 آماده</div>
+
+        <div class="post-form-card">
+          <div class="post-input-group">
+            <input type="text" class="name-input" id="userNameInput" placeholder="👤 نام شما..." maxlength="30">
+            <textarea class="post-input" id="postContentInput" placeholder="✍️ پست خود را بنویسید..." maxlength="500"></textarea>
+            <button class="post-btn" id="submitPostBtn"><i class="fas fa-paper-plane"></i> ارسال</button>
+          </div>
+        </div>
+
+        <div class="posts-feed" id="postsFeed">
+          <div class="loading"><i class="fas fa-spinner"></i> در حال بارگذاری...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <i class="far fa-gem"></i> فایت کلاب | <span class="dev-text">Team Null</span>
+  </div>
+</div>
+
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="side-menu" id="sideMenu">
+  <div class="menu-item" data-page="home"><i class="fas fa-home"></i> خانه</div>
+  <div class="menu-item" data-page="links"><i class="fas fa-link"></i> لینک‌ها</div>
+  <div class="menu-item" data-page="admins"><i class="fas fa-user-shield"></i> ادمین‌ها</div>
+  <div class="menu-item" data-page="posts"><i class="fas fa-comments"></i> پست‌های کاربران</div>
+  <div class="menu-item" data-page="about"><i class="fas fa-info-circle"></i> درباره ما</div>
+  <div class="menu-item" data-page="honor"><i class="fas fa-medal"></i> تالار افتخارات</div>
+  <div class="menu-item" data-page="news"><i class="fas fa-bullhorn"></i> اخبار</div>
+</div>
+
+<div class="music-player" id="musicPlayer">
+  <button class="music-btn" id="toggleMusicBtn"><i class="fas fa-play" id="musicIcon"></i></button>
+  <span>🎵 موزیک</span>
+  <audio id="bgMusic" loop preload="auto">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+</div>
+
+<script>
+  (function() {
+    // ==================== API کانفیگ ====================
+    const API_URL = 'https://jsonblob.com/api/jsonBlob/1351464841432031232';
+    // ==================================================
+
+    let posts = [];
+    const postsFeed = document.getElementById('postsFeed');
+    const statusBar = document.getElementById('statusBar');
+    const submitBtn = document.getElementById('submitPostBtn');
+    const userNameInput = document.getElementById('userNameInput');
+    const postContentInput = document.getElementById('postContentInput');
+
+    // نمایش وضعیت
+    function setStatus(msg, type) {
+      statusBar.textContent = msg;
+      statusBar.className = 'status-bar';
+      if (type) statusBar.classList.add(type);
+    }
+
+    // بارگذاری پست‌ها از API
+    async function loadPosts() {
+      postsFeed.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i> در حال بارگذاری...</div>';
+      setStatus('🔄 در حال دریافت پست‌ها...');
+      
+      try {
+        const response = await fetch(API_URL, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+        
+        if (!response.ok) throw new Error('خطا در دریافت');
+        
+        posts = await response.json();
+        if (!Array.isArray(posts)) posts = [];
+        
+        setStatus('✅ پست‌ها بارگذاری شدند', 'success');
+        setTimeout(() => setStatus('🔄 آماده'), 2000);
+        
+        renderPosts();
+      } catch (error) {
+        console.error('خطا:', error);
+        postsFeed.innerHTML = '<div class="no-posts">❌ خطا در بارگذاری پست‌ها</div>';
+        setStatus('❌ خطا در اتصال', 'error');
+      }
+    }
+
+    // ذخیره پست‌ها در API
+    async function savePosts() {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(posts)
+        });
+        
+        if (!response.ok) throw new Error('خطا در ذخیره');
+        return true;
+      } catch (error) {
+        console.error('خطا:', error);
+        return false;
+      }
+    }
+
+    // نمایش پست‌ها
+    function renderPosts() {
+      if (!posts.length) {
+        postsFeed.innerHTML = '<div class="no-posts">💬 اولین پست رو شما بنویسید!</div>';
+        return;
+      }
+      
+      postsFeed.innerHTML = [...posts].reverse().map((p, i) => {
+        const realIndex = posts.findIndex(post => post.timestamp === p.timestamp);
+        
+        return `
+          <div class="post-card">
+            <div class="post-header">
+              <div class="user-avatar">${(p.userName||'?')[0].toUpperCase()}</div>
+              <div>
+                <div class="user-name">${escapeHtml(p.userName)||'ناشناس'}</div>
+                <div class="post-time">${new Date(p.timestamp).toLocaleString('fa-IR')}</div>
+              </div>
+            </div>
+            <div class="post-content">${escapeHtml(p.content)}</div>
+            <div class="post-actions">
+              <button class="action-btn like-btn ${p.liked?'liked':''}" onclick="window.toggleLike('${p.timestamp}')">
+                <i class="${p.liked?'fas':'far'} fa-heart"></i> ${p.likes||0}
+              </button>
+              <button class="action-btn" onclick="window.copyText('${escapeHtml(p.content).replace(/'/g,"\\'")}')">
+                <i class="far fa-copy"></i> کپی
+              </button>
+              <button class="action-btn delete-btn" onclick="window.deletePost('${p.timestamp}')">
+                <i class="far fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ارسال پست جدید
+    async function submitPost() {
+      const userName = userNameInput.value.trim();
+      const content = postContentInput.value.trim();
+      
+      if (!userName) { setStatus('⚠️ نام را وارد کنید', 'error'); return; }
+      if (!content) { setStatus('⚠️ متن پست را وارد کنید', 'error'); return; }
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ارسال...';
+      setStatus('🔄 در حال ذخیره...');
+      
+      const newPost = {
+        userName,
+        content,
+        timestamp: Date.now(),
+        likes: 0,
+        liked: false
+      };
+      
+      posts.push(newPost);
+      
+      const saved = await savePosts();
+      
+      if (saved) {
+        userNameInput.value = '';
+        postContentInput.value = '';
+        renderPosts();
+        setStatus('✅ پست با موفقیت ثبت شد!', 'success');
+        setTimeout(() => setStatus('🔄 آماده'), 2000);
+      } else {
+        posts.pop();
+        setStatus('❌ خطا در ذخیره. دوباره تلاش کنید', 'error');
+      }
+      
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ارسال';
+    }
+
+    // توابع عمومی
+    window.toggleLike = async function(timestamp) {
+      const index = posts.findIndex(p => p.timestamp.toString() === timestamp.toString());
+      if (index !== -1) {
+        posts[index].liked ? (posts[index].likes--, posts[index].liked = false) 
+                           : (posts[index].likes++, posts[index].liked = true);
+        await savePosts();
+        renderPosts();
+      }
+    };
+
+    window.copyText = function(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        setStatus('✅ کپی شد!', 'success');
+        setTimeout(() => setStatus('🔄 آماده'), 2000);
+      });
+    };
+
+    window.deletePost = async function(timestamp) {
+      const index = posts.findIndex(p => p.timestamp.toString() === timestamp.toString());
+      if (index !== -1 && confirm('حذف شود؟')) {
+        posts.splice(index, 1);
+        await savePosts();
+        renderPosts();
+        setStatus('🗑️ پست حذف شد', 'success');
+        setTimeout(() => setStatus('🔄 آماده'), 2000);
+      }
+    };
+
+    // Event Listeners
+    submitBtn.addEventListener('click', submitPost);
+    postContentInput.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') submitPost();
+    });
+
+    // منو
+    const menu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('menuOverlay');
+    
+    document.getElementById('menuToggleBtn').onclick = () => {
+      menu.classList.toggle('active');
+      overlay.classList.toggle('show');
+    };
+    
+    overlay.onclick = () => {
+      menu.classList.remove('active');
+      overlay.classList.remove('show');
+    };
+
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.onclick = () => {
+        const page = item.dataset.page;
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(page + 'Page').classList.add('active-page');
+        if (page === 'posts') loadPosts();
+        menu.classList.remove('active');
+        overlay.classList.remove('show');
+      };
+    });
+
+    // کپی آیدی
+    document.getElementById('copyBtn').onclick = () => {
+      navigator.clipboard.writeText('@link_fight_club_ble');
+      setStatus('✅ آیدی کپی شد!', 'success');
+      setTimeout(() => setStatus('🔄 آماده'), 2000);
+    };
+
+    // موزیک
+    const bgMusic = document.getElementById('bgMusic');
+    const musicIcon = document.getElementById('musicIcon');
+    let playing = false;
+
+    document.getElementById('toggleMusicBtn').onclick = () => {
+      playing ? (bgMusic.pause(), musicIcon.className='fas fa-play') 
+              : (bgMusic.play(), musicIcon.className='fas fa-pause');
+      playing = !playing;
+    };
+    
+    bgMusic.volume = 0.25;
+
+    // بارگذاری اولیه
+    loadPosts();
+  })();
+</script>
+</body>
+</html>
